@@ -247,6 +247,16 @@ ol.steps li::before{
   font-size: 16px;
   letter-spacing: 0.04em;
   margin-bottom: 18px;
+  text-decoration: none;
+  border-bottom: 1px solid var(--hairline);
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.cta-email:hover,
+.cta-email:focus{
+  color: var(--blood-bright);
+  border-color: var(--blood-bright);
 }
 
 .cta-note{
