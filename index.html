@@ -113,6 +113,7 @@
     cursor:pointer;
   }
   .btn:hover{background:var(--white);color:var(--black);transform:translateY(-2px);}
+  .btn:active{transform:scale(.94);}
   .btn.ghost{background:transparent;color:var(--black);}
   .btn.ghost:hover{background:var(--black);color:var(--white);}
 
@@ -257,14 +258,6 @@
 
   ::-webkit-scrollbar{width:0;}
 
-  /* ---------- page curtain transition ---------- */
-  .page-curtain{
-    position:fixed;inset:0;z-index:9999;
-    background:var(--black);
-    transform:translateY(100%);
-    pointer-events:none;
-  }
-
   /* ---------- cursor glow ---------- */
   .cursor-glow{
     position:fixed;top:0;left:0;
@@ -288,12 +281,19 @@
   .price-item,.work-card{transition:transform .15s ease-out, padding-left .3s cubic-bezier(.2,.8,.2,1);}
   .back-link{display:inline-flex;align-items:center;gap:6px;margin-bottom:26px;transition:transform .25s, color .25s;}
   .back-link:hover{transform:translateX(-3px);}
+
+  /* ---------- arrival pulse, fires when you land on the form ---------- */
+  @keyframes arrivePulse{
+    0%{box-shadow:0 0 0 0 rgba(255,255,255,.35);}
+    70%{box-shadow:0 0 0 22px rgba(255,255,255,0);}
+    100%{box-shadow:0 0 0 0 rgba(255,255,255,0);}
+  }
+  .form-shell.arrive-pulse{animation:arrivePulse .8s ease-out;border-radius:16px;}
 </style>
 </head>
 <body>
 
 <div class="grain"></div>
-<div class="page-curtain" id="curtain"></div>
 <div class="cursor-glow" id="cursorGlow"></div>
 
 <nav>
@@ -788,35 +788,34 @@ function attachTilt(els){
 }
 attachTilt(document.querySelectorAll('.price-item, .work-card'));
 
-/* ---------- page curtain: makes #contact feel like its own page ---------- */
-const curtain = document.getElementById('curtain');
-function curtainTransition(targetId){
-  curtain.style.transition = 'transform .55s cubic-bezier(.76,0,.24,1)';
-  curtain.style.transform = 'translateY(0)';
-  const onCover = (e)=>{
-    if(e.propertyName !== 'transform') return;
-    curtain.removeEventListener('transitionend', onCover);
-    document.getElementById(targetId).scrollIntoView({behavior:'auto', block:'start'});
-    requestAnimationFrame(()=>{
-      curtain.style.transition = 'transform .55s cubic-bezier(.76,0,.24,1)';
-      curtain.style.transform = 'translateY(-100%)';
-    });
-    curtain.addEventListener('transitionend', function onReveal(e2){
-      if(e2.propertyName !== 'transform') return;
-      curtain.removeEventListener('transitionend', onReveal);
-      curtain.style.transition = 'none';
-      curtain.style.transform = 'translateY(100%)';
-    });
-  };
-  curtain.addEventListener('transitionend', onCover);
+/* ---------- enquire: fast custom scroll + a fun arrival pulse ---------- */
+function fastScrollTo(el, duration=380){
+  const startY = window.pageYOffset;
+  const targetY = el.getBoundingClientRect().top + startY;
+  const dist = targetY - startY;
+  const startTime = performance.now();
+  function ease(t){ return t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; }
+  function step(now){
+    const t = Math.min(1, (now-startTime)/duration);
+    window.scrollTo(0, startY + dist*ease(t));
+    if(t<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+function pulseTarget(el){
+  el.classList.remove('arrive-pulse');
+  void el.offsetWidth; // restart animation
+  el.classList.add('arrive-pulse');
 }
 document.getElementById('enquireBtn').addEventListener('click', e=>{
   e.preventDefault();
-  curtainTransition('contact');
+  const target = document.getElementById('contact');
+  fastScrollTo(target);
+  setTimeout(()=>pulseTarget(document.querySelector('.form-shell')), 380);
 });
 document.getElementById('backHome').addEventListener('click', e=>{
   e.preventDefault();
-  curtainTransition('home');
+  fastScrollTo(document.getElementById('home'));
 });
 </script>
 
