@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -240,11 +239,6 @@
   @keyframes pop{0%{transform:scale(0);}60%{transform:scale(1.25);}100%{transform:scale(1);}}
   .success h3{font-family:'Space Grotesk',sans-serif;font-size:30px;margin:16px 0 10px;}
   .success p{color:#999;}
-  .confetti-piece{position:absolute;top:-10px;width:7px;height:12px;opacity:.95;animation:confetti-fall 1.9s ease-in forwards;pointer-events:none;}
-  @keyframes confetti-fall{
-    0%{transform:translateY(0) rotate(0deg);opacity:1;}
-    100%{transform:translateY(360px) rotate(540deg);opacity:0;}
-  }
 
   /* ---------- footer ---------- */
   footer{
@@ -684,21 +678,6 @@ document.getElementById('toStep2').addEventListener('click',()=>{
 });
 document.getElementById('toStep1back').addEventListener('click',()=>goStep(1));
 
-/* ---------- confetti burst ---------- */
-function launchConfetti(container){
-  const colors = ['#ffffff','#ffb7cf','#dedad0','#7a7a76'];
-  for(let n=0;n<50;n++){
-    const el = document.createElement('div');
-    el.className = 'confetti-piece';
-    el.style.left = Math.random()*100+'%';
-    el.style.background = colors[Math.floor(Math.random()*colors.length)];
-    el.style.animationDelay = (Math.random()*0.35)+'s';
-    el.style.transform = 'rotate('+Math.floor(Math.random()*360)+'deg)';
-    container.appendChild(el);
-    setTimeout(()=>el.remove(), 2300);
-  }
-}
-
 /* ---------- form submit via fetch (no page reload) ---------- */
 const form = document.getElementById('intakeForm');
 form.addEventListener('submit', async (e)=>{
@@ -714,9 +693,7 @@ form.addEventListener('submit', async (e)=>{
     if(res.ok){
       form.style.display='none';
       document.querySelector('.step-track').style.display='none';
-      const successEl = document.getElementById('successMsg');
-      successEl.classList.add('show');
-      launchConfetti(successEl);
+      document.getElementById('successMsg').classList.add('show');
     } else {
       alert('something went wrong — try again?');
       btn.textContent = 'send it →';
