@@ -66,7 +66,7 @@
     position:relative;
     padding:120px 32px 60px;
   }
-  #dots{position:absolute;inset:0;z-index:0;}
+  #dots{position:absolute;inset:0;z-index:0;cursor:crosshair;}
   .hero-inner{position:relative;z-index:1;max-width:1100px;margin:0 auto;width:100%;}
   .eyebrow{
     font-family:'JetBrains Mono',monospace;
@@ -111,7 +111,7 @@
     transition:transform .35s cubic-bezier(.2,.8,.2,1), background .3s, color .3s;
     cursor:pointer;
   }
-  .btn:hover{background:var(--white);color:var(--black);}
+  .btn:hover{background:var(--white);color:var(--black);transform:translateY(-2px);}
   .btn.ghost{background:transparent;color:var(--black);}
   .btn.ghost:hover{background:var(--black);color:var(--white);}
 
@@ -145,9 +145,10 @@
   .price-banner{background:var(--black);color:var(--white);padding:110px 0;}
   .price-flag{display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#ffb7cf;border:1px solid #333;padding:9px 18px;border-radius:100px;margin-bottom:26px;}
   .price-banner h2{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:clamp(28px,4.5vw,48px);letter-spacing:-.02em;max-width:680px;}
-  .price-grid{display:flex;gap:1px;background:#2c2c2c;border:1px solid #2c2c2c;margin-top:50px;flex-wrap:wrap;}
-  .price-item{background:var(--black);flex:1;min-width:160px;padding:28px 24px;}
-  .price-tag{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#888;margin-bottom:10px;}
+  .price-grid{display:flex;flex-direction:column;gap:1px;background:#2c2c2c;border:1px solid #2c2c2c;margin-top:50px;}
+  .price-item{background:var(--black);padding:26px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px;transition:padding-left .3s cubic-bezier(.2,.8,.2,1);}
+  .price-item:hover{padding-left:38px;}
+  .price-tag{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#888;}
   .price-amt{font-family:'Space Grotesk',sans-serif;font-size:36px;font-weight:700;}
   .price-note{margin-top:30px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#888;line-height:1.7;max-width:640px;}
 
@@ -198,7 +199,7 @@
   .contact{background:var(--black);color:var(--white);}
   .contact .section-head .label,.contact .section-head h2{color:var(--white);}
   .contact .label{color:#888;}
-  .form-shell{max-width:640px;}
+  .form-shell{max-width:640px;position:relative;}
   .step-track{display:flex;gap:6px;margin-bottom:36px;}
   .step-track span{height:3px;flex:1;background:#2c2c2c;border-radius:2px;overflow:hidden;position:relative;}
   .step-track span i{position:absolute;inset:0;background:var(--white);transform:translateX(-100%);transition:transform .5s cubic-bezier(.2,.8,.2,1);}
@@ -212,9 +213,10 @@
   .opt{
     border:1.5px solid #2c2c2c;border-radius:14px;padding:18px 20px;
     font-family:'Inter',sans-serif;font-size:15px;color:var(--white);
-    cursor:pointer;transition:border-color .25s, background .25s;
+    cursor:pointer;transition:border-color .25s, background .25s, transform .15s;
   }
   .opt:hover{border-color:#666;}
+  .opt:active{transform:scale(.98);}
   .opt.sel{border-color:var(--white);background:#141414;}
   input[type=text],input[type=email],textarea{
     width:100%;background:transparent;border:none;border-bottom:1.5px solid #2c2c2c;
@@ -230,11 +232,17 @@
   .btn.light:hover{background:transparent;color:var(--white);border-color:var(--white);}
   .back-link{font-family:'JetBrains Mono',monospace;font-size:12px;color:#888;cursor:pointer;background:none;border:none;}
   .back-link:hover{color:var(--white);}
-  .success{display:none;text-align:center;padding:40px 0;}
+  .success{display:none;text-align:center;padding:40px 0;position:relative;overflow:visible;}
   .success.show{display:block;}
-  .success .big{font-size:48px;}
+  .success .big{font-size:48px;display:inline-block;animation:pop .5s cubic-bezier(.2,1.4,.4,1);}
+  @keyframes pop{0%{transform:scale(0);}60%{transform:scale(1.25);}100%{transform:scale(1);}}
   .success h3{font-family:'Space Grotesk',sans-serif;font-size:30px;margin:16px 0 10px;}
   .success p{color:#999;}
+  .confetti-piece{position:absolute;top:-10px;width:7px;height:12px;opacity:.95;animation:confetti-fall 1.9s ease-in forwards;pointer-events:none;}
+  @keyframes confetti-fall{
+    0%{transform:translateY(0) rotate(0deg);opacity:1;}
+    100%{transform:translateY(360px) rotate(540deg);opacity:0;}
+  }
 
   /* ---------- footer ---------- */
   footer{
@@ -247,11 +255,45 @@
   footer a:hover{color:var(--white);}
 
   ::-webkit-scrollbar{width:0;}
+
+  /* ---------- page curtain transition ---------- */
+  .page-curtain{
+    position:fixed;inset:0;z-index:9999;
+    background:var(--black);
+    transform:translateY(100%);
+    pointer-events:none;
+  }
+
+  /* ---------- cursor glow ---------- */
+  .cursor-glow{
+    position:fixed;top:0;left:0;
+    width:22px;height:22px;border-radius:50%;
+    background:var(--black);
+    mix-blend-mode:difference;
+    pointer-events:none;
+    z-index:9997;
+    opacity:0;
+    transform:translate(-50%,-50%);
+  }
+  @media (hover:none){.cursor-glow{display:none;}}
+
+  /* ---------- countdown ---------- */
+  .countdown-row{display:flex;gap:10px;margin-top:28px;flex-wrap:wrap;}
+  .cd-box{background:#141414;border:1px solid #2c2c2c;border-radius:12px;padding:14px 20px;text-align:center;min-width:72px;}
+  .cd-num{display:block;font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;}
+  .cd-label{display:block;font-family:'JetBrains Mono',monospace;font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-top:4px;}
+
+  /* ---------- tilt targets ---------- */
+  .price-item,.work-card{transition:transform .15s ease-out, padding-left .3s cubic-bezier(.2,.8,.2,1);}
+  .back-link{display:inline-flex;align-items:center;gap:6px;margin-bottom:26px;transition:transform .25s, color .25s;}
+  .back-link:hover{transform:translateX(-3px);}
 </style>
 </head>
 <body>
 
 <div class="grain"></div>
+<div class="page-curtain" id="curtain"></div>
+<div class="cursor-glow" id="cursorGlow"></div>
 
 <nav>
   <div class="nav-logo">site pls<span class="dot"></span></div>
@@ -259,7 +301,7 @@
 </nav>
 
 <!-- ================= HERO ================= -->
-<section class="hero">
+<section class="hero" id="home">
   <canvas id="dots"></canvas>
   <div class="hero-inner">
     <div class="eyebrow"><span class="sq"></span>dhaka, bangladesh — building since 2026</div>
@@ -269,7 +311,8 @@
     </h1>
     <p>i design and build websites for small businesses that actually want to look like they know what they're doing. no templates. no bloated agencies. just a site that works.</p>
     <div class="hero-cta">
-      <a href="#work" class="btn ghost">see the work</a>
+      <a href="#work" class="btn ghost">builds</a>
+      <a href="#contact" class="btn" id="enquireBtn">enquire</a>
     </div>
   </div>
 </section>
@@ -318,6 +361,12 @@
     <div class="reveal">
       <div class="price-flag">⏳ these rates hold until october only</div>
       <h2>get in before the price goes up.</h2>
+      <div class="countdown-row" id="countdown">
+        <div class="cd-box"><span class="cd-num" id="cdDays">00</span><span class="cd-label">days</span></div>
+        <div class="cd-box"><span class="cd-num" id="cdHrs">00</span><span class="cd-label">hrs</span></div>
+        <div class="cd-box"><span class="cd-num" id="cdMin">00</span><span class="cd-label">min</span></div>
+        <div class="cd-box"><span class="cd-num" id="cdSec">00</span><span class="cd-label">sec</span></div>
+      </div>
       <div class="price-grid">
         <div class="price-item">
           <div class="price-tag">landing page</div>
@@ -332,7 +381,7 @@
           <div class="price-amt">৳4,000</div>
         </div>
       </div>
-      <div class="price-note">domain is bought separately by you, the client · order forms run on Formspree's free plan (40/mo) — past that, a Formspree upgrade is on you too</div>
+      <div class="price-note">domain is bought separately by you, the client</div>
     </div>
   </div>
 </section>
@@ -412,10 +461,6 @@
         <button class="faq-q">Who buys the domain?<span class="plus">+</span></button>
         <div class="faq-a"><p>You do — domains are purchased separately, by you. Don't want to buy one yet? We can host free at yourname.github.io instead.</p></div>
       </div>
-      <div class="faq-item">
-        <button class="faq-q">What if I get a lot of orders?<span class="plus">+</span></button>
-        <div class="faq-a"><p>Order forms run on Formspree's free plan, which covers up to 40 orders a month. Past that, you'd need a Formspree upgrade — that cost is on you, not us.</p></div>
-      </div>
       <div class="faq-cat-label">process</div>
       <div class="faq-item">
         <button class="faq-q">How long does a build take?<span class="plus">+</span></button>
@@ -437,9 +482,10 @@
 <!-- ================= CONTACT / FORM ================= -->
 <section class="contact" id="contact">
   <div class="wrap">
+    <a href="#home" class="back-link mono" id="backHome">← back to builds</a>
     <div class="section-head reveal">
       <div>
-        <div class="label">let's talk</div>
+        <div class="label">enquire</div>
         <h2>tell me what you need.</h2>
       </div>
     </div>
@@ -450,7 +496,9 @@
         <span data-s="2"><i></i></span>
       </div>
 
-      <form id="intakeForm" action="https://formspree.io/f/mnpapyyb" method="POST">
+      <form id="intakeForm" action="https://formsubmit.co/your@email.com" method="POST">
+        <input type="hidden" name="_subject" value="New enquiry from site pls.">
+        <input type="hidden" name="_captcha" value="false">
 
         <div class="fstep active" data-step="1">
           <div class="fstep-label">step 1 / 2</div>
@@ -496,21 +544,16 @@
 <footer>
   <div class="wrap" style="display:flex;justify-content:space-between;width:100%;flex-wrap:wrap;gap:14px;align-items:center;">
     <span>site pls. © 2026</span>
-    <span style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-      <a href="https://instagram.com/site.pls" target="_blank">@site.pls</a>
-      <span style="color:#555;">— our only way to connect</span>
-      <a href="#contact" style="text-decoration:underline;text-underline-offset:3px;">enquire</a>
-    </span>
+    <a href="https://instagram.com/site.pls" target="_blank">@site.pls</a>
     <span id="clock" class="mono">dhaka · --:--:--</span>
   </div>
 </footer>
 
 <script>
 /* ---------- typing effect ---------- */
-const words = "sites that don't suck.".split(' ');
-const typedEl = document.getElementById('typed');
 const full = "building sites";
 let i=0;
+const typedEl = document.getElementById('typed');
 function typeWriter(){
   if(i<=full.length){
     typedEl.textContent = full.slice(0,i);
@@ -526,10 +569,10 @@ const obs = new IntersectionObserver((entries)=>{
 },{threshold:.15});
 document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 
-/* ---------- dot canvas background ---------- */
+/* ---------- dot canvas background (hover glow + click fireworks) ---------- */
 const canvas = document.getElementById('dots');
 const ctx = canvas.getContext('2d');
-let W,H,dots=[];
+let W,H,dots=[],bursts=[];
 function resize(){
   W = canvas.width = canvas.offsetWidth;
   H = canvas.height = canvas.offsetHeight;
@@ -547,8 +590,26 @@ canvas.addEventListener('mousemove', e=>{
   mouse.x = e.clientX-rect.left; mouse.y = e.clientY-rect.top;
 });
 canvas.addEventListener('mouseleave',()=>{mouse.x=-9999;mouse.y=-9999;});
+
+/* click = little firework burst, just for fun */
+canvas.addEventListener('click', e=>{
+  const rect = canvas.getBoundingClientRect();
+  const cx = e.clientX-rect.left, cy = e.clientY-rect.top;
+  const n = 18;
+  for(let k=0;k<n;k++){
+    const ang = (Math.PI*2*k)/n + Math.random()*.3;
+    const speed = 1.4 + Math.random()*2.2;
+    bursts.push({
+      x:cx,y:cy,
+      vx:Math.cos(ang)*speed, vy:Math.sin(ang)*speed,
+      life:1
+    });
+  }
+});
+
 function draw(t){
   ctx.clearRect(0,0,W,H);
+
   ctx.fillStyle = '#0a0a0a';
   dots.forEach(d=>{
     const dx = d.x-mouse.x, dy=d.y-mouse.y;
@@ -565,6 +626,18 @@ function draw(t){
     ctx.arc(d.x,d.y,r,0,Math.PI*2);
     ctx.fill();
   });
+
+  bursts.forEach(b=>{
+    b.x += b.vx; b.y += b.vy;
+    b.vx *= 0.96; b.vy *= 0.96;
+    b.life -= 0.02;
+    ctx.globalAlpha = Math.max(0,b.life);
+    ctx.beginPath();
+    ctx.arc(b.x,b.y,2.2,0,Math.PI*2);
+    ctx.fill();
+  });
+  bursts = bursts.filter(b=>b.life>0);
+
   ctx.globalAlpha = 1;
   requestAnimationFrame(draw);
 }
@@ -610,6 +683,21 @@ document.getElementById('toStep2').addEventListener('click',()=>{
 });
 document.getElementById('toStep1back').addEventListener('click',()=>goStep(1));
 
+/* ---------- confetti burst ---------- */
+function launchConfetti(container){
+  const colors = ['#ffffff','#ffb7cf','#dedad0','#7a7a76'];
+  for(let n=0;n<50;n++){
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.left = Math.random()*100+'%';
+    el.style.background = colors[Math.floor(Math.random()*colors.length)];
+    el.style.animationDelay = (Math.random()*0.35)+'s';
+    el.style.transform = 'rotate('+Math.floor(Math.random()*360)+'deg)';
+    container.appendChild(el);
+    setTimeout(()=>el.remove(), 2300);
+  }
+}
+
 /* ---------- form submit via fetch (no page reload) ---------- */
 const form = document.getElementById('intakeForm');
 form.addEventListener('submit', async (e)=>{
@@ -625,7 +713,9 @@ form.addEventListener('submit', async (e)=>{
     if(res.ok){
       form.style.display='none';
       document.querySelector('.step-track').style.display='none';
-      document.getElementById('successMsg').classList.add('show');
+      const successEl = document.getElementById('successMsg');
+      successEl.classList.add('show');
+      launchConfetti(successEl);
     } else {
       alert('something went wrong — try again?');
       btn.textContent = 'send it →';
@@ -644,6 +734,89 @@ function updateClock(){
 }
 updateClock();
 setInterval(updateClock, 1000);
+
+/* ---------- countdown to october ---------- */
+const cutoff = new Date('2026-10-01T00:00:00+06:00');
+function updateCountdown(){
+  const diff = cutoff - new Date();
+  const box = document.getElementById('countdown');
+  if(diff <= 0){
+    box.innerHTML = '<div class="cd-box" style="min-width:auto;"><span class="cd-num" style="font-size:16px;">rates just changed</span></div>';
+    return;
+  }
+  const d = Math.floor(diff/86400000);
+  const h = Math.floor((diff%86400000)/3600000);
+  const m = Math.floor((diff%3600000)/60000);
+  const s = Math.floor((diff%60000)/1000);
+  document.getElementById('cdDays').textContent = String(d).padStart(2,'0');
+  document.getElementById('cdHrs').textContent = String(h).padStart(2,'0');
+  document.getElementById('cdMin').textContent = String(m).padStart(2,'0');
+  document.getElementById('cdSec').textContent = String(s).padStart(2,'0');
+}
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+/* ---------- cursor glow, follows with a little lag ---------- */
+const glow = document.getElementById('cursorGlow');
+let gx=-100, gy=-100, tx=-100, ty=-100;
+window.addEventListener('mousemove', e=>{
+  tx = e.clientX; ty = e.clientY;
+  glow.style.opacity = '.6';
+});
+window.addEventListener('mouseleave', ()=>{ glow.style.opacity='0'; });
+function glowLoop(){
+  gx += (tx-gx)*0.18;
+  gy += (ty-gy)*0.18;
+  glow.style.transform = `translate(${gx}px, ${gy}px) translate(-50%,-50%)`;
+  requestAnimationFrame(glowLoop);
+}
+glowLoop();
+
+/* ---------- tilt on price + work cards, just for feel ---------- */
+function attachTilt(els){
+  els.forEach(el=>{
+    el.addEventListener('mousemove', e=>{
+      const r = el.getBoundingClientRect();
+      const x = e.clientX-r.left, y = e.clientY-r.top;
+      const rx = ((y/r.height)-0.5) * -7;
+      const ry = ((x/r.width)-0.5) * 7;
+      el.style.transform = `perspective(700px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+    });
+    el.addEventListener('mouseleave', ()=>{ el.style.transform=''; });
+  });
+}
+attachTilt(document.querySelectorAll('.price-item, .work-card'));
+
+/* ---------- page curtain: makes #contact feel like its own page ---------- */
+const curtain = document.getElementById('curtain');
+function curtainTransition(targetId){
+  curtain.style.transition = 'transform .55s cubic-bezier(.76,0,.24,1)';
+  curtain.style.transform = 'translateY(0)';
+  const onCover = (e)=>{
+    if(e.propertyName !== 'transform') return;
+    curtain.removeEventListener('transitionend', onCover);
+    document.getElementById(targetId).scrollIntoView({behavior:'auto', block:'start'});
+    requestAnimationFrame(()=>{
+      curtain.style.transition = 'transform .55s cubic-bezier(.76,0,.24,1)';
+      curtain.style.transform = 'translateY(-100%)';
+    });
+    curtain.addEventListener('transitionend', function onReveal(e2){
+      if(e2.propertyName !== 'transform') return;
+      curtain.removeEventListener('transitionend', onReveal);
+      curtain.style.transition = 'none';
+      curtain.style.transform = 'translateY(100%)';
+    });
+  };
+  curtain.addEventListener('transitionend', onCover);
+}
+document.getElementById('enquireBtn').addEventListener('click', e=>{
+  e.preventDefault();
+  curtainTransition('contact');
+});
+document.getElementById('backHome').addEventListener('click', e=>{
+  e.preventDefault();
+  curtainTransition('home');
+});
 </script>
 
 </body>
